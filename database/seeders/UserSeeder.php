@@ -11,22 +11,14 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // Create Admin User
+        // Create Admin User only
         User::create([
             'name' => 'Admin',
             'email' => 'admin@finance.com',
             'password' => Hash::make('password'),
             'role' => UserRole::ADMIN,
             'email_verified_at' => now(),
-        ]);
-
-        // Create Demo User
-        User::create([
-            'name' => 'User Demo',
-            'email' => 'user@finance.com',
-            'password' => Hash::make('password'),
-            'role' => UserRole::USER,
-            'email_verified_at' => now(),
+            'currency' => 'IDR',
         ]);
     }
 }

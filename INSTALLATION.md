@@ -101,36 +101,21 @@ php artisan cache:clear
 
 ---
 
-## Fitur Mata Uang
-
-Aplikasi mendukung 7 mata uang:
-- **IDR** - Rupiah (Rp)
-- **USD** - US Dollar ($)
-- **EUR** - Euro (€)
-- **GBP** - British Pound (£)
-- **JPY** - Japanese Yen (¥)
-- **SGD** - Singapore Dollar (S$)
-- **MYR** - Malaysian Ringgit (RM)
-
-Untuk mengganti mata uang:
-1. Login ke aplikasi
-2. Buka menu **Pengaturan**
-3. Pilih mata uang dari dropdown
-4. Sistem akan otomatis mengupdate semua tampilan
-
----
-
 ## Akun Default
+
+Setelah menjalankan migration dan seeder, sistem akan membuat 1 akun admin:
 
 ### Admin
 - Email: `admin@finance.com`
 - Password: `password`
-- Akses: Dashboard Admin, User Management
+- Akses: Dashboard Admin, User Management, Semua Data User
 
-### User
-- Email: `user@finance.com`
-- Password: `password`
-- Akses: Dashboard, Transaksi, Anggaran, Laporan, Pengaturan
+**Catatan:** 
+- User baru dapat mendaftar melalui halaman `/register`
+- Admin dapat membuat user baru melalui User Management
+- Semua transaksi menggunakan mata uang Rupiah (IDR)
+- Bahasa sistem: Bahasa Indonesia
+- Timezone: Asia/Jakarta
 
 ---
 
