@@ -7,7 +7,7 @@ use Illuminate\Support\Collection;
 
 interface BudgetServiceInterface
 {
-    public function getAllBudgets(int $userId): Collection;
+    public function getAllBudgets(?int $userId): Collection;
     
     public function getActiveBudgets(int $userId): Collection;
     
@@ -19,7 +19,7 @@ interface BudgetServiceInterface
     
     public function deleteBudget(int $id, int $userId): bool;
     
-    public function getBudgetSummary(int $userId): array;
+    public function getBudgetSummary(?int $userId): array;
     
     public function checkBudgetAlerts(int $userId): Collection;
 }

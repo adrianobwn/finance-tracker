@@ -15,7 +15,8 @@ class BudgetController extends Controller
 
     public function index()
     {
-        $userId = auth()->id();
+        // Admin can see all users' data, regular users see only their own
+        $userId = auth()->user()->role->value === 'admin' ? null : auth()->id();
         
         $budgets = $this->budgetService->getAllBudgets($userId);
         $summary = $this->budgetService->getBudgetSummary($userId);

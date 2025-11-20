@@ -15,7 +15,8 @@ class TransactionController extends Controller
 
     public function index()
     {
-        $userId = auth()->id();
+        // Admin can see all users' data, regular users see only their own
+        $userId = auth()->user()->role->value === 'admin' ? null : auth()->id();
         
         $transactions = $this->transactionService->getAllTransactions($userId);
         $stats = $this->transactionService->getTransactionStats($userId);

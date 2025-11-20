@@ -19,10 +19,10 @@
 
                 <!-- Amount -->
                 <div class="mb-6">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Jumlah Anggaran</label>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Jumlah Budget</label>
                     <div class="relative">
                         <span class="absolute left-4 top-3 text-gray-500 font-medium">Rp</span>
-                        <input type="number" name="amount" class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="0" required>
+                        <input type="number" name="amount" min="0" step="0.01" class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="0" required>
                     </div>
                 </div>
 

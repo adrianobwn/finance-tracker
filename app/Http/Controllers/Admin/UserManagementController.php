@@ -48,28 +48,16 @@ class UserManagementController extends Controller
 
     public function update(Request $request, User $user)
     {
+        // Admin hanya bisa mengubah role user, tidak bisa mengubah data lainnya
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
             'role' => ['required', 'in:user,admin'],
         ]);
 
-        $data = [
-            'name' => $request->name,
-            'email' => $request->email,
+        $user->update([
             'role' => UserRole::from($request->role),
-        ];
+        ]);
 
-        if ($request->filled('password')) {
-            $request->validate([
-                'password' => ['confirmed', Password::defaults()],
-            ]);
-            $data['password'] = Hash::make($request->password);
-        }
-
-        $user->update($data);
-
-        return redirect()->route('admin.users.index')->with('success', 'User berhasil diupdate!');
+        return redirect()->route('admin.users.index')->with('success', 'Role user berhasil diupdate!');
     }
 
     public function destroy(User $user)

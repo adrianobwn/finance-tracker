@@ -75,28 +75,50 @@
             <!-- Progress Bar -->
             <div class="mb-4">
                 <div class="flex items-center justify-between mb-2">
-                    <span class="text-sm font-semibold text-gray-700">Rp {{ number_format($budget->spent, 0, ',', '.') }}</span>
-                    <span class="text-sm font-semibold text-gray-700">Rp {{ number_format($budget->amount, 0, ',', '.') }}</span>
+                    <div>
+                        <span class="text-xs text-gray-500">Terpakai</span>
+                        <p class="text-sm font-bold text-gray-800">Rp {{ number_format($budget->spent, 0, ',', '.') }}</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs text-gray-500">Target</span>
+                        <p class="text-sm font-bold text-gray-800">Rp {{ number_format($budget->amount, 0, ',', '.') }}</p>
+                    </div>
                 </div>
-                <div class="w-full bg-gray-200 rounded-full h-3">
-                    <div class="h-3 rounded-full transition-all duration-300 {{ $budget->percentage >= 90 ? 'bg-red-500' : ($budget->percentage >= 70 ? 'bg-yellow-500' : 'bg-green-500') }}" style="width: {{ min($budget->percentage, 100) }}%"></div>
+                <div class="relative w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+                    @php
+                        $percentage = min($budget->percentage, 100);
+                        $color = $budget->percentage >= 100 ? 'bg-red-500' : ($budget->percentage >= 90 ? 'bg-orange-500' : ($budget->percentage >= 70 ? 'bg-yellow-500' : 'bg-green-500'));
+                    @endphp
+                    <div class="h-4 rounded-full transition-all duration-300 {{ $color }} flex items-center justify-center" style="width: {{ $percentage }}%">
+                        @if($percentage >= 15)
+                        <span class="text-xs font-bold text-white">{{ $budget->percentage }}%</span>
+                        @endif
+                    </div>
+                    @if($percentage < 15 && $budget->percentage > 0)
+                    <span class="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-600">{{ $budget->percentage }}%</span>
+                    @endif
                 </div>
             </div>
 
             <!-- Stats -->
-            <div class="grid grid-cols-3 gap-4 pt-4 border-t border-gray-100">
+            <div class="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100">
                 <div>
-                    <p class="text-xs text-gray-500 mb-1">Terpakai</p>
-                    <p class="text-sm font-bold {{ $budget->percentage >= 90 ? 'text-red-600' : 'text-gray-800' }}">{{ $budget->percentage }}%</p>
+                    <p class="text-xs text-gray-500 mb-1">Sisa Budget</p>
+                    <p class="text-sm font-bold {{ $budget->remaining < 0 ? 'text-red-600' : 'text-green-600' }}">
+                        Rp {{ number_format(abs($budget->remaining), 0, ',', '.') }}
+                        @if($budget->remaining < 0)
+                        <span class="text-xs">(Lebih)</span>
+                        @endif
+                    </p>
                 </div>
-                <div>
-                    <p class="text-xs text-gray-500 mb-1">Sisa</p>
-                    <p class="text-sm font-bold text-gray-800">Rp {{ number_format($budget->remaining, 0, ',', '.') }}</p>
-                </div>
-                <div>
+                <div class="text-right">
                     <p class="text-xs text-gray-500 mb-1">Status</p>
-                    @if($budget->percentage >= 90)
+                    @if($budget->percentage >= 100)
                     <span class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full font-medium">
+                        <i class="fas fa-times-circle"></i> Melebihi
+                    </span>
+                    @elseif($budget->percentage >= 90)
+                    <span class="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full font-medium">
                         <i class="fas fa-exclamation-circle"></i> Kritis
                     </span>
                     @elseif($budget->percentage >= 70)

@@ -9,11 +9,15 @@ use Illuminate\Support\Facades\DB;
 
 class TransactionService implements TransactionServiceInterface
 {
-    public function getAllTransactions(int $userId): Collection
+    public function getAllTransactions(?int $userId): Collection
     {
-        return Transaction::with('category')
-            ->forUser($userId)
-            ->orderBy('transaction_date', 'desc')
+        $query = Transaction::with('category');
+        
+        if ($userId !== null) {
+            $query->forUser($userId);
+        }
+        
+        return $query->orderBy('transaction_date', 'desc')
             ->orderBy('created_at', 'desc')
             ->get();
     }
@@ -106,9 +110,13 @@ class TransactionService implements TransactionServiceInterface
         }
     }
     
-    public function getTransactionStats(int $userId, ?string $startDate = null, ?string $endDate = null): array
+    public function getTransactionStats(?int $userId, ?string $startDate = null, ?string $endDate = null): array
     {
-        $query = Transaction::forUser($userId);
+        $query = Transaction::query();
+        
+        if ($userId !== null) {
+            $query->forUser($userId);
+        }
         
         if ($startDate && $endDate) {
             $query->inDateRange($startDate, $endDate);
@@ -124,11 +132,15 @@ class TransactionService implements TransactionServiceInterface
         ];
     }
     
-    public function getRecentTransactions(int $userId, int $limit = 5): Collection
+    public function getRecentTransactions(?int $userId, int $limit = 5): Collection
     {
-        return Transaction::with('category')
-            ->forUser($userId)
-            ->orderBy('transaction_date', 'desc')
+        $query = Transaction::with('category');
+        
+        if ($userId !== null) {
+            $query->forUser($userId);
+        }
+        
+        return $query->orderBy('transaction_date', 'desc')
             ->orderBy('created_at', 'desc')
             ->limit($limit)
             ->get();

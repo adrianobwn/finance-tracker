@@ -62,7 +62,7 @@ class Budget extends Model
 
     public function getRemainingAttribute(): float
     {
-        return max(0, $this->amount - $this->spent);
+        return $this->amount - $this->spent;
     }
 
     public function getIsOverBudgetAttribute(): bool

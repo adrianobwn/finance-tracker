@@ -55,38 +55,41 @@
 
     <!-- Filter Section -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
-        <div class="flex items-center justify-between">
-            <h3 class="text-lg font-bold text-gray-800">Filter Laporan</h3>
-            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium">
-                <i class="fas fa-download mr-2"></i>
-                Export PDF
-            </button>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Periode</label>
-                <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
-                    <option>Tahun Ini</option>
-                    <option>Bulan Ini</option>
-                    <option>Minggu Ini</option>
-                    <option>Custom</option>
-                </select>
+        <form action="{{ route('reports.index') }}" method="GET" id="filterForm">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-bold text-gray-800">Filter Laporan</h3>
+                <a href="{{ route('reports.export', ['start_date' => $startDate, 'end_date' => $endDate]) }}" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm font-medium">
+                    <i class="fas fa-file-excel mr-2"></i>
+                    Export Excel
+                </a>
             </div>
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Dari Tanggal</label>
-                <input type="date" value="{{ date('Y-01-01') }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Periode</label>
+                    <select id="periodSelect" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm" onchange="updateDateRange()">
+                        <option value="custom">Custom</option>
+                        <option value="today">Hari Ini</option>
+                        <option value="this_week">Minggu Ini</option>
+                        <option value="this_month">Bulan Ini</option>
+                        <option value="this_year" selected>Tahun Ini</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Dari Tanggal</label>
+                    <input type="date" name="start_date" id="startDate" value="{{ $startDate }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Sampai Tanggal</label>
+                    <input type="date" name="end_date" id="endDate" value="{{ $endDate }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
+                </div>
+                <div class="flex items-end">
+                    <button type="submit" class="w-full px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition text-sm font-medium">
+                        <i class="fas fa-filter mr-2"></i>
+                        Terapkan Filter
+                    </button>
+                </div>
             </div>
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Sampai Tanggal</label>
-                <input type="date" value="{{ date('Y-m-d') }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
-            </div>
-            <div class="flex items-end">
-                <button class="w-full px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition text-sm font-medium">
-                    <i class="fas fa-filter mr-2"></i>
-                    Terapkan Filter
-                </button>
-            </div>
-        </div>
+        </form>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -294,5 +297,36 @@
             }
         }
     });
+
+    // Period selector functionality
+    function updateDateRange() {
+        const period = document.getElementById('periodSelect').value;
+        const today = new Date();
+        let startDate, endDate;
+
+        switch(period) {
+            case 'today':
+                startDate = endDate = today.toISOString().split('T')[0];
+                break;
+            case 'this_week':
+                const firstDayOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
+                startDate = firstDayOfWeek.toISOString().split('T')[0];
+                endDate = new Date().toISOString().split('T')[0];
+                break;
+            case 'this_month':
+                startDate = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
+                endDate = new Date().toISOString().split('T')[0];
+                break;
+            case 'this_year':
+                startDate = new Date(today.getFullYear(), 0, 1).toISOString().split('T')[0];
+                endDate = new Date().toISOString().split('T')[0];
+                break;
+            default:
+                return; // Custom - do nothing
+        }
+
+        document.getElementById('startDate').value = startDate;
+        document.getElementById('endDate').value = endDate;
+    }
 </script>
 @endsection

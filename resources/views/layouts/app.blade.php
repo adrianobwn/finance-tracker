@@ -43,50 +43,52 @@
             </div>
 
             <nav class="p-4">
-                <p class="text-xs font-semibold text-gray-400 uppercase mb-3 px-3">Menu Utama</p>
-                <ul class="space-y-1">
-                    <li>
-                        <a href="{{ route('dashboard') }}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('dashboard') ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50' }} transition">
-                            <i class="fas fa-home w-5"></i>
-                            <span class="font-medium">Dashboard</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('transactions.index') }}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('transactions.*') ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50' }} transition">
-                            <i class="fas fa-exchange-alt w-5"></i>
-                            <span class="font-medium">Transaksi</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('budgets.index') }}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('budgets.*') ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50' }} transition">
-                            <i class="fas fa-wallet w-5"></i>
-                            <span class="font-medium">Anggaran</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('reports.index') }}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('reports.*') ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50' }} transition">
-                            <i class="fas fa-file-alt w-5"></i>
-                            <span class="font-medium">Laporan</span>
-                        </a>
-                    </li>
-                </ul>
-
                 @if(auth()->user()->role->value === 'admin')
-                <p class="text-xs font-semibold text-gray-400 uppercase mb-3 px-3 mt-6">Admin</p>
-                <ul class="space-y-1">
-                    <li>
-                        <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('admin.dashboard') ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50' }} transition">
-                            <i class="fas fa-chart-bar w-5"></i>
-                            <span class="font-medium">Admin Dashboard</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('admin.users.index') }}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('admin.users.*') ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50' }} transition">
-                            <i class="fas fa-users-cog w-5"></i>
-                            <span class="font-medium">User Management</span>
-                        </a>
-                    </li>
-                </ul>
+                    {{-- Admin only sees Admin menu --}}
+                    <p class="text-xs font-semibold text-gray-400 uppercase mb-3 px-3">Menu Admin</p>
+                    <ul class="space-y-1">
+                        <li>
+                            <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('admin.dashboard') ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50' }} transition">
+                                <i class="fas fa-chart-bar w-5"></i>
+                                <span class="font-medium">Admin Dashboard</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.users.index') }}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('admin.users.*') ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50' }} transition">
+                                <i class="fas fa-users-cog w-5"></i>
+                                <span class="font-medium">User Management</span>
+                            </a>
+                        </li>
+                    </ul>
+                @else
+                    {{-- Regular users see full menu --}}
+                    <p class="text-xs font-semibold text-gray-400 uppercase mb-3 px-3">Menu Utama</p>
+                    <ul class="space-y-1">
+                        <li>
+                            <a href="{{ route('dashboard') }}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('dashboard') ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50' }} transition">
+                                <i class="fas fa-home w-5"></i>
+                                <span class="font-medium">Dashboard</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('transactions.index') }}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('transactions.*') ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50' }} transition">
+                                <i class="fas fa-exchange-alt w-5"></i>
+                                <span class="font-medium">Transaksi</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('budgets.index') }}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('budgets.*') ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50' }} transition">
+                                <i class="fas fa-wallet w-5"></i>
+                                <span class="font-medium">Anggaran</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('reports.index') }}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('reports.*') ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50' }} transition">
+                                <i class="fas fa-file-alt w-5"></i>
+                                <span class="font-medium">Laporan</span>
+                            </a>
+                        </li>
+                    </ul>
                 @endif
             </nav>
         </aside>

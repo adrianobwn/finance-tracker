@@ -8,12 +8,15 @@ use Illuminate\Support\Facades\DB;
 
 class BudgetService implements BudgetServiceInterface
 {
-    public function getAllBudgets(int $userId): Collection
+    public function getAllBudgets(?int $userId): Collection
     {
-        return Budget::with('category')
-            ->forUser($userId)
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $query = Budget::with('category');
+        
+        if ($userId !== null) {
+            $query->forUser($userId);
+        }
+        
+        return $query->orderBy('created_at', 'desc')->get();
     }
     
     public function getActiveBudgets(int $userId): Collection
@@ -61,9 +64,15 @@ class BudgetService implements BudgetServiceInterface
         return $budget->delete();
     }
     
-    public function getBudgetSummary(int $userId): array
+    public function getBudgetSummary(?int $userId): array
     {
-        $budgets = $this->getActiveBudgets($userId);
+        $query = Budget::query()->active();
+        
+        if ($userId !== null) {
+            $query->forUser($userId);
+        }
+        
+        $budgets = $query->get();
         
         $totalBudget = $budgets->sum('amount');
         $totalSpent = $budgets->sum('spent');

@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class ReportService implements ReportServiceInterface
 {
-    public function getMonthlyReport(int $userId, int $year): array
+    public function getMonthlyReport(?int $userId, int $year): array
     {
         $months = [];
         $income = [];
@@ -20,15 +20,17 @@ class ReportService implements ReportServiceInterface
             
             $months[] = date('M', strtotime($startDate));
             
-            $monthIncome = Transaction::forUser($userId)
-                ->byType(TransactionType::INCOME)
-                ->inDateRange($startDate, $endDate)
-                ->sum('amount');
+            $incomeQuery = Transaction::query()->byType(TransactionType::INCOME)->inDateRange($startDate, $endDate);
+            if ($userId !== null) {
+                $incomeQuery->forUser($userId);
+            }
+            $monthIncome = $incomeQuery->sum('amount');
             
-            $monthExpense = Transaction::forUser($userId)
-                ->byType(TransactionType::EXPENSE)
-                ->inDateRange($startDate, $endDate)
-                ->sum('amount');
+            $expenseQuery = Transaction::query()->byType(TransactionType::EXPENSE)->inDateRange($startDate, $endDate);
+            if ($userId !== null) {
+                $expenseQuery->forUser($userId);
+            }
+            $monthExpense = $expenseQuery->sum('amount');
             
             $income[] = (float) $monthIncome;
             $expense[] = (float) $monthExpense;
@@ -41,12 +43,17 @@ class ReportService implements ReportServiceInterface
         ];
     }
     
-    public function getCategoryBreakdown(int $userId, string $startDate, string $endDate): array
+    public function getCategoryBreakdown(?int $userId, string $startDate, string $endDate): array
     {
-        $breakdown = Transaction::with('category')
-            ->forUser($userId)
+        $query = Transaction::with('category')
             ->byType(TransactionType::EXPENSE)
-            ->inDateRange($startDate, $endDate)
+            ->inDateRange($startDate, $endDate);
+        
+        if ($userId !== null) {
+            $query->forUser($userId);
+        }
+        
+        $breakdown = $query
             ->select('category_id', DB::raw('SUM(amount) as total'))
             ->groupBy('category_id')
             ->orderBy('total', 'desc')
@@ -66,17 +73,19 @@ class ReportService implements ReportServiceInterface
         })->toArray();
     }
     
-    public function getFinancialSummary(int $userId, string $startDate, string $endDate): array
+    public function getFinancialSummary(?int $userId, string $startDate, string $endDate): array
     {
-        $totalIncome = Transaction::forUser($userId)
-            ->byType(TransactionType::INCOME)
-            ->inDateRange($startDate, $endDate)
-            ->sum('amount');
+        $incomeQuery = Transaction::query()->byType(TransactionType::INCOME)->inDateRange($startDate, $endDate);
+        if ($userId !== null) {
+            $incomeQuery->forUser($userId);
+        }
+        $totalIncome = $incomeQuery->sum('amount');
         
-        $totalExpense = Transaction::forUser($userId)
-            ->byType(TransactionType::EXPENSE)
-            ->inDateRange($startDate, $endDate)
-            ->sum('amount');
+        $expenseQuery = Transaction::query()->byType(TransactionType::EXPENSE)->inDateRange($startDate, $endDate);
+        if ($userId !== null) {
+            $expenseQuery->forUser($userId);
+        }
+        $totalExpense = $expenseQuery->sum('amount');
         
         $netSavings = $totalIncome - $totalExpense;
         $savingsRate = $totalIncome > 0 ? round(($netSavings / $totalIncome) * 100, 2) : 0;
@@ -89,7 +98,7 @@ class ReportService implements ReportServiceInterface
         ];
     }
     
-    public function getTrendData(int $userId, int $months = 6): array
+    public function getTrendData(?int $userId, int $months = 6): array
     {
         $labels = [];
         $income = [];
@@ -102,15 +111,16 @@ class ReportService implements ReportServiceInterface
             
             $labels[] = $date->format('M');
             
-            $monthIncome = Transaction::forUser($userId)
-                ->byType(TransactionType::INCOME)
-                ->inDateRange($startDate, $endDate)
-                ->sum('amount');
+            $incomeQuery = Transaction::query()->byType(TransactionType::INCOME)->inDateRange($startDate, $endDate);
+            $expenseQuery = Transaction::query()->byType(TransactionType::EXPENSE)->inDateRange($startDate, $endDate);
             
-            $monthExpense = Transaction::forUser($userId)
-                ->byType(TransactionType::EXPENSE)
-                ->inDateRange($startDate, $endDate)
-                ->sum('amount');
+            if ($userId !== null) {
+                $incomeQuery->forUser($userId);
+                $expenseQuery->forUser($userId);
+            }
+            
+            $monthIncome = $incomeQuery->sum('amount');
+            $monthExpense = $expenseQuery->sum('amount');
             
             $income[] = (float) $monthIncome;
             $expense[] = (float) $monthExpense;

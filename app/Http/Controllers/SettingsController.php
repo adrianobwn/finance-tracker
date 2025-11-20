@@ -9,6 +9,11 @@ class SettingsController extends Controller
 {
     public function index()
     {
+        // Admin doesn't need category management, only users do
+        if (auth()->user()->role->value === 'admin') {
+            return view('settings.index-admin');
+        }
+        
         $categories = Category::forUser(auth()->id())->get();
         
         return view('settings.index', compact('categories'));

@@ -18,6 +18,12 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $userId = auth()->id();
+        $isAdmin = auth()->user()->role->value === 'admin';
+        
+        // Admin sees all data, regular users see only their own
+        if ($isAdmin) {
+            $userId = null; // null means all users
+        }
         
         // Get transaction stats
         $stats = $this->transactionService->getTransactionStats($userId);

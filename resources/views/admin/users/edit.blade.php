@@ -26,36 +26,25 @@
                 @csrf
                 @method('PUT')
 
-                <!-- Name -->
-                <div class="mb-6">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
-                        <i class="fas fa-user mr-1"></i> Nama Lengkap
-                    </label>
-                    <input 
-                        type="text" 
-                        name="name" 
-                        value="{{ old('name', $user->name) }}"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                        required
-                    >
+                <!-- User Info (Read Only) -->
+                <div class="mb-6 bg-gray-50 p-4 rounded-lg">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 mb-1">Nama Lengkap</label>
+                            <p class="text-gray-800 font-medium">{{ $user->name }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 mb-1">Email</label>
+                            <p class="text-gray-800 font-medium">{{ $user->email }}</p>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-3">
+                        <i class="fas fa-info-circle mr-1"></i> Data user hanya bisa diubah oleh user yang bersangkutan
+                    </p>
                 </div>
 
-                <!-- Email -->
-                <div class="mb-6">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
-                        <i class="fas fa-envelope mr-1"></i> Email
-                    </label>
-                    <input 
-                        type="email" 
-                        name="email" 
-                        value="{{ old('email', $user->email) }}"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                        required
-                    >
-                </div>
-
-                <!-- Role -->
-                <div class="mb-6">
+                <!-- Role (Only editable field) -->
+                <div class="mb-8">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">
                         <i class="fas fa-user-tag mr-1"></i> Role
                     </label>
@@ -72,40 +61,13 @@
                     </p>
                 </div>
 
-                <!-- Password (Optional) -->
-                <div class="mb-6">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
-                        <i class="fas fa-lock mr-1"></i> Password Baru (Kosongkan jika tidak ingin mengubah)
-                    </label>
-                    <input 
-                        type="password" 
-                        name="password"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                        placeholder="Minimal 8 karakter"
-                    >
-                    <p class="text-xs text-gray-500 mt-1">Kosongkan jika tidak ingin mengubah password</p>
-                </div>
-
-                <!-- Confirm Password -->
-                <div class="mb-8">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
-                        <i class="fas fa-lock mr-1"></i> Konfirmasi Password Baru
-                    </label>
-                    <input 
-                        type="password" 
-                        name="password_confirmation"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                        placeholder="Ketik ulang password"
-                    >
-                </div>
-
                 <!-- Buttons -->
                 <div class="flex items-center space-x-4">
                     <button 
                         type="submit"
                         class="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold"
                     >
-                        <i class="fas fa-save mr-2"></i> Update User
+                        <i class="fas fa-save mr-2"></i> Update Role
                     </button>
                     <a 
                         href="{{ route('admin.users.index') }}"
