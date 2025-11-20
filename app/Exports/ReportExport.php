@@ -6,11 +6,8 @@ use App\Models\Transaction;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithStyles;
-use Maatwebsite\Excel\Concerns\WithTitle;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class ReportExport implements FromCollection, WithHeadings, WithMapping, WithStyles, WithTitle
+class ReportExport implements FromCollection, WithHeadings, WithMapping
 {
     protected $userId;
     protected $startDate;
@@ -54,19 +51,7 @@ class ReportExport implements FromCollection, WithHeadings, WithMapping, WithSty
             $transaction->description,
             $transaction->category->name ?? '-',
             $transaction->type->value === 'income' ? 'Pemasukan' : 'Pengeluaran',
-            'Rp ' . number_format($transaction->amount, 0, ',', '.'),
+            number_format($transaction->amount, 0, ',', '.'),
         ];
-    }
-
-    public function styles(Worksheet $sheet)
-    {
-        return [
-            1 => ['font' => ['bold' => true]],
-        ];
-    }
-
-    public function title(): string
-    {
-        return 'Laporan Keuangan';
     }
 }

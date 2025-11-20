@@ -25,8 +25,41 @@ class DashboardController extends Controller
             $userId = null; // null means all users
         }
         
-        // Get transaction stats
-        $stats = $this->transactionService->getTransactionStats($userId);
+        // Handle date filtering
+        $startDate = null;
+        $endDate = null;
+        
+        if ($request->has('start_date') && $request->has('end_date')) {
+            $startDate = $request->start_date;
+            $endDate = $request->end_date;
+        } elseif ($request->has('period')) {
+            $period = $request->period;
+            switch ($period) {
+                case 'this_month':
+                    $startDate = now()->startOfMonth()->format('Y-m-d');
+                    $endDate = now()->endOfMonth()->format('Y-m-d');
+                    break;
+                case 'last_month':
+                    $startDate = now()->subMonth()->startOfMonth()->format('Y-m-d');
+                    $endDate = now()->subMonth()->endOfMonth()->format('Y-m-d');
+                    break;
+                case 'this_year':
+                    $startDate = now()->startOfYear()->format('Y-m-d');
+                    $endDate = now()->endOfYear()->format('Y-m-d');
+                    break;
+                case 'all':
+                    $startDate = null;
+                    $endDate = null;
+                    break;
+            }
+        } else {
+            // Default: this month
+            $startDate = now()->startOfMonth()->format('Y-m-d');
+            $endDate = now()->endOfMonth()->format('Y-m-d');
+        }
+        
+        // Get transaction stats with date filter
+        $stats = $this->transactionService->getTransactionStats($userId, $startDate, $endDate);
         
         // Get budget summary
         $budgetSummary = $this->budgetService->getBudgetSummary($userId);

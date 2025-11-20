@@ -158,50 +158,26 @@
             </h3>
 
             <div class="space-y-6">
-                <!-- Currency -->
-                <form action="{{ route('settings.currency.update') }}" method="POST">
-                    @csrf
-                    <div class="flex items-center justify-between pb-6 border-b border-gray-200">
-                        <div>
-                            <p class="font-semibold text-gray-800">Mata Uang</p>
-                            <p class="text-sm text-gray-600">Mata uang yang digunakan untuk transaksi</p>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <select name="currency" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" onchange="this.form.submit()">
-                                <option value="IDR" {{ $user->currency === 'IDR' ? 'selected' : '' }}>IDR - Rupiah Indonesia</option>
-                                <option value="USD" {{ $user->currency === 'USD' ? 'selected' : '' }}>USD - US Dollar</option>
-                                <option value="EUR" {{ $user->currency === 'EUR' ? 'selected' : '' }}>EUR - Euro</option>
-                                <option value="GBP" {{ $user->currency === 'GBP' ? 'selected' : '' }}>GBP - British Pound</option>
-                                <option value="JPY" {{ $user->currency === 'JPY' ? 'selected' : '' }}>JPY - Japanese Yen</option>
-                                <option value="SGD" {{ $user->currency === 'SGD' ? 'selected' : '' }}>SGD - Singapore Dollar</option>
-                                <option value="MYR" {{ $user->currency === 'MYR' ? 'selected' : '' }}>MYR - Malaysian Ringgit</option>
-                            </select>
-                        </div>
-                    </div>
-                </form>
-
-                <!-- Notifications -->
+                <!-- Currency - Fixed to Rupiah -->
                 <div class="flex items-center justify-between pb-6 border-b border-gray-200">
                     <div>
-                        <p class="font-semibold text-gray-800">Notifikasi Email</p>
-                        <p class="text-sm text-gray-600">Terima notifikasi untuk budget dan transaksi</p>
+                        <p class="font-semibold text-gray-800">Mata Uang</p>
+                        <p class="text-sm text-gray-600">Mata uang yang digunakan untuk transaksi</p>
                     </div>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" class="sr-only peer" checked>
-                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                    </label>
+                    <div class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700 font-semibold">
+                        IDR - Rupiah Indonesia
+                    </div>
                 </div>
 
-                <!-- Language -->
+                <!-- Language - Fixed to Indonesian -->
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="font-semibold text-gray-800">Bahasa</p>
-                        <p class="text-sm text-gray-600">Pilih bahasa tampilan</p>
+                        <p class="text-sm text-gray-600">Bahasa tampilan aplikasi</p>
                     </div>
-                    <select class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                        <option>Bahasa Indonesia</option>
-                        <option>English</option>
-                    </select>
+                    <div class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700 font-semibold">
+                        Bahasa Indonesia
+                    </div>
                 </div>
             </div>
         </div>

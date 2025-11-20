@@ -36,6 +36,8 @@ class UserManagementController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => UserRole::from($request->role),
+            'email_verified_at' => now(),
+            'currency' => 'IDR',
         ]);
 
         return redirect()->route('admin.users.index')->with('success', 'User berhasil ditambahkan!');
