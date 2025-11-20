@@ -2,103 +2,116 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\Finance\BudgetServiceInterface;
+use App\Models\Category;
+use App\Enums\TransactionType;
 use Illuminate\Http\Request;
 
 class BudgetController extends Controller
 {
+    public function __construct(
+        private BudgetServiceInterface $budgetService
+    ) {}
+
     public function index()
     {
-        $budgets = [
-            [
-                'id' => 1,
-                'name' => 'Belanja Bulanan',
-                'amount' => 5000000,
-                'spent' => 3750000,
-                'percentage' => 75,
-                'category' => 'Belanja',
-                'period' => 'Bulanan',
-                'start_date' => '2024-11-01',
-                'end_date' => '2024-11-30'
-            ],
-            [
-                'id' => 2,
-                'name' => 'Transport & Bensin',
-                'amount' => 2000000,
-                'spent' => 1200000,
-                'percentage' => 60,
-                'category' => 'Transport',
-                'period' => 'Bulanan',
-                'start_date' => '2024-11-01',
-                'end_date' => '2024-11-30'
-            ],
-            [
-                'id' => 3,
-                'name' => 'Entertainment',
-                'amount' => 1500000,
-                'spent' => 500000,
-                'percentage' => 33,
-                'category' => 'Entertainment',
-                'period' => 'Bulanan',
-                'start_date' => '2024-11-01',
-                'end_date' => '2024-11-30'
-            ],
-            [
-                'id' => 4,
-                'name' => 'Makan & Minum',
-                'amount' => 3000000,
-                'spent' => 2800000,
-                'percentage' => 93,
-                'category' => 'Makanan',
-                'period' => 'Bulanan',
-                'start_date' => '2024-11-01',
-                'end_date' => '2024-11-30'
-            ],
-        ];
-
-        $summary = [
-            'totalBudget' => 11500000,
-            'totalSpent' => 8250000,
-            'remaining' => 3250000,
-            'percentage' => 72
-        ];
+        $userId = auth()->id();
+        
+        $budgets = $this->budgetService->getAllBudgets($userId);
+        $summary = $this->budgetService->getBudgetSummary($userId);
 
         return view('budgets.index', compact('budgets', 'summary'));
     }
 
     public function create()
     {
-        $categories = ['Belanja', 'Transport', 'Makanan', 'Entertainment', 'Tagihan', 'Kesehatan', 'Pendidikan'];
+        $userId = auth()->id();
+        
+        $categories = Category::forUser($userId)
+            ->byType(TransactionType::EXPENSE)
+            ->get();
+
         return view('budgets.create', compact('categories'));
     }
 
     public function store(Request $request)
     {
-        return redirect()->route('budgets.index')->with('success', 'Anggaran berhasil ditambahkan!');
+        $userId = auth()->id();
+        
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'amount' => 'required|numeric|min:0',
+            'category_id' => 'nullable|exists:categories,id',
+            'period' => 'required|in:weekly,monthly,yearly',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after:start_date',
+        ]);
+
+        try {
+            $this->budgetService->createBudget($validated, $userId);
+            return redirect()->route('budgets.index')->with('success', 'Anggaran berhasil ditambahkan!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal menambahkan anggaran: ' . $e->getMessage())->withInput();
+        }
     }
 
     public function edit($id)
     {
-        $budget = [
-            'id' => $id,
-            'name' => 'Belanja Bulanan',
-            'amount' => 5000000,
-            'category' => 'Belanja',
-            'period' => 'monthly',
-            'start_date' => '2024-11-01',
-            'end_date' => '2024-11-30'
-        ];
+        $userId = auth()->id();
+        
+        $budget = $this->budgetService->getBudgetById($id, $userId);
+        
+        if (!$budget) {
+            return redirect()->route('budgets.index')->with('error', 'Anggaran tidak ditemukan!');
+        }
 
-        $categories = ['Belanja', 'Transport', 'Makanan', 'Entertainment', 'Tagihan', 'Kesehatan', 'Pendidikan'];
+        $categories = Category::forUser($userId)
+            ->byType(TransactionType::EXPENSE)
+            ->get();
+
         return view('budgets.edit', compact('budget', 'categories'));
     }
 
     public function update(Request $request, $id)
     {
-        return redirect()->route('budgets.index')->with('success', 'Anggaran berhasil diupdate!');
+        $userId = auth()->id();
+        
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'amount' => 'required|numeric|min:0',
+            'category_id' => 'nullable|exists:categories,id',
+            'period' => 'required|in:weekly,monthly,yearly',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after:start_date',
+        ]);
+
+        try {
+            $result = $this->budgetService->updateBudget($id, $validated, $userId);
+            
+            if ($result) {
+                return redirect()->route('budgets.index')->with('success', 'Anggaran berhasil diupdate!');
+            }
+            
+            return back()->with('error', 'Anggaran tidak ditemukan!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal mengupdate anggaran: ' . $e->getMessage())->withInput();
+        }
     }
 
     public function destroy($id)
     {
-        return redirect()->route('budgets.index')->with('success', 'Anggaran berhasil dihapus!');
+        $userId = auth()->id();
+        
+        try {
+            $result = $this->budgetService->deleteBudget($id, $userId);
+            
+            if ($result) {
+                return redirect()->route('budgets.index')->with('success', 'Anggaran berhasil dihapus!');
+            }
+            
+            return back()->with('error', 'Anggaran tidak ditemukan!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal menghapus anggaran: ' . $e->getMessage());
+        }
     }
 }

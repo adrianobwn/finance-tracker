@@ -51,16 +51,16 @@
                 <!-- Category -->
                 <div class="mb-6">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Kategori</label>
-                    <select name="category" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                    <select name="category_id" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                         <option value="">Pilih Kategori</option>
                         <optgroup label="Pemasukan">
                             @foreach($categories['income'] as $cat)
-                            <option value="{{ $cat }}" {{ $transaction['category'] === $cat ? 'selected' : '' }}>{{ $cat }}</option>
+                            <option value="{{ $cat->id }}" {{ $transaction->category_id == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
                             @endforeach
                         </optgroup>
                         <optgroup label="Pengeluaran">
                             @foreach($categories['expense'] as $cat)
-                            <option value="{{ $cat }}" {{ $transaction['category'] === $cat ? 'selected' : '' }}>{{ $cat }}</option>
+                            <option value="{{ $cat->id }}" {{ $transaction->category_id == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
                             @endforeach
                         </optgroup>
                     </select>

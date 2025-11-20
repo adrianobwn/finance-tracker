@@ -2,51 +2,42 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\Finance\TransactionServiceInterface;
+use App\Services\Finance\BudgetServiceInterface;
+use App\Services\Finance\ReportServiceInterface;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    public function index()
-    {
-        // Data dummy untuk demo
-        $data = [
-            'totalSales' => 15750000,
-            'totalIncome' => 25000000,
-            'totalExpense' => 9250000,
-            'budgetPercentage' => 75,
-            'recentTransactions' => [
-                [
-                    'id' => 1,
-                    'description' => 'Gaji Bulanan',
-                    'category' => 'Gaji',
-                    'amount' => 10000000,
-                    'type' => 'income',
-                    'date' => '2024-11-16'
-                ],
-                [
-                    'id' => 2,
-                    'description' => 'Makan siang tim',
-                    'category' => 'Makanan',
-                    'amount' => -150000,
-                    'type' => 'expense',
-                    'date' => '2024-11-17'
-                ],
-                [
-                    'id' => 3,
-                    'description' => 'Grab ke kantor',
-                    'category' => 'Transport',
-                    'amount' => -75000,
-                    'type' => 'expense',
-                    'date' => '2024-11-18'
-                ],
-            ],
-            'chartData' => [
-                'labels' => ['Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                'income' => [18000000, 19500000, 20000000, 22000000, 25000000],
-                'expense' => [6500000, 7000000, 7500000, 8000000, 9250000]
-            ]
-        ];
+    public function __construct(
+        private TransactionServiceInterface $transactionService,
+        private BudgetServiceInterface $budgetService,
+        private ReportServiceInterface $reportService
+    ) {}
 
-        return view('dashboard', $data);
+    public function index(Request $request)
+    {
+        $userId = auth()->id();
+        
+        // Get transaction stats
+        $stats = $this->transactionService->getTransactionStats($userId);
+        
+        // Get budget summary
+        $budgetSummary = $this->budgetService->getBudgetSummary($userId);
+        
+        // Get recent transactions
+        $recentTransactions = $this->transactionService->getRecentTransactions($userId, 3);
+        
+        // Get chart data (6 months trend)
+        $chartData = $this->reportService->getTrendData($userId, 6);
+        
+        return view('dashboard', [
+            'totalSales' => $stats['balance'],
+            'totalIncome' => $stats['totalIncome'],
+            'totalExpense' => $stats['totalExpense'],
+            'budgetPercentage' => $budgetSummary['percentage'] ?? 0,
+            'recentTransactions' => $recentTransactions,
+            'chartData' => $chartData,
+        ]);
     }
 }

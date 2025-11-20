@@ -98,24 +98,29 @@
                 <p class="text-sm text-gray-500">5 transaksi terakhir Anda</p>
             </div>
             <div class="space-y-4">
-                @foreach($recentTransactions as $transaction)
+                @forelse($recentTransactions as $transaction)
                 <div class="flex items-start justify-between pb-4 border-b border-gray-100 last:border-0 last:pb-0">
                     <div class="flex items-start space-x-3">
-                        <div class="w-10 h-10 {{ $transaction['type'] === 'income' ? 'bg-green-50' : 'bg-red-50' }} rounded-lg flex items-center justify-center flex-shrink-0">
-                            <i class="fas {{ $transaction['type'] === 'income' ? 'fa-plus text-green-600' : 'fa-minus text-red-600' }}"></i>
+                        <div class="w-10 h-10 {{ $transaction->type->value === 'income' ? 'bg-green-50' : 'bg-red-50' }} rounded-lg flex items-center justify-center flex-shrink-0">
+                            <i class="fas {{ $transaction->type->value === 'income' ? 'fa-plus text-green-600' : 'fa-minus text-red-600' }}"></i>
                         </div>
                         <div>
-                            <p class="text-sm font-semibold text-gray-800">{{ $transaction['description'] }}</p>
-                            <p class="text-xs text-gray-500">{{ $transaction['category'] }} • {{ date('d-m-Y', strtotime($transaction['date'])) }}</p>
+                            <p class="text-sm font-semibold text-gray-800">{{ $transaction->description }}</p>
+                            <p class="text-xs text-gray-500">{{ $transaction->category->name }} • {{ $transaction->transaction_date->format('d-m-Y') }}</p>
                         </div>
                     </div>
                     <div class="text-right">
-                        <p class="text-sm font-bold {{ $transaction['type'] === 'income' ? 'text-green-600' : 'text-red-600' }}">
-                            {{ $transaction['type'] === 'income' ? '+' : '-'}}Rp {{ number_format(abs($transaction['amount']), 0, ',', '.') }}
+                        <p class="text-sm font-bold {{ $transaction->type->value === 'income' ? 'text-green-600' : 'text-red-600' }}">
+                            {{ $transaction->type->value === 'income' ? '+' : '-'}}Rp {{ number_format($transaction->amount, 0, ',', '.') }}
                         </p>
                     </div>
                 </div>
-                @endforeach
+                @empty
+                <div class="text-center py-8 text-gray-500">
+                    <i class="fas fa-inbox text-4xl mb-2"></i>
+                    <p>Belum ada transaksi</p>
+                </div>
+                @endforelse
             </div>
             <button class="w-full mt-6 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium">
                 Lihat Semua Transaksi
@@ -127,14 +132,25 @@
 <script>
     // Chart.js Configuration
     const ctx = document.getElementById('financeChart').getContext('2d');
+    
+    // Parse data dan pastikan dalam format number yang benar
+    const chartLabels = @json($chartData['labels']);
+    const incomeData = @json($chartData['income']).map(val => parseFloat(val) || 0);
+    const expenseData = @json($chartData['expense']).map(val => parseFloat(val) || 0);
+    
+    // Debug: Log data ke console
+    console.log('Labels:', chartLabels);
+    console.log('Income:', incomeData);
+    console.log('Expense:', expenseData);
+    
     const financeChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: @json($chartData['labels']),
+            labels: chartLabels,
             datasets: [
                 {
                     label: 'Pemasukan',
-                    data: @json($chartData['income']),
+                    data: incomeData,
                     borderColor: 'rgb(34, 197, 94)',
                     backgroundColor: 'rgba(34, 197, 94, 0.1)',
                     fill: true,
@@ -143,7 +159,7 @@
                 },
                 {
                     label: 'Pengeluaran',
-                    data: @json($chartData['expense']),
+                    data: expenseData,
                     borderColor: 'rgb(239, 68, 68)',
                     backgroundColor: 'rgba(239, 68, 68, 0.1)',
                     fill: true,
@@ -184,7 +200,13 @@
                             if (label) {
                                 label += ': ';
                             }
-                            label += 'Rp ' + context.parsed.y.toLocaleString('id-ID');
+                            if (context.parsed.y >= 1000000) {
+                                label += 'Rp ' + (context.parsed.y / 1000000).toFixed(1) + ' jt';
+                            } else if (context.parsed.y >= 1000) {
+                                label += 'Rp ' + (context.parsed.y / 1000).toFixed(0) + ' rb';
+                            } else {
+                                label += 'Rp ' + context.parsed.y.toLocaleString('id-ID');
+                            }
                             return label;
                         }
                     }
@@ -195,7 +217,15 @@
                     beginAtZero: true,
                     ticks: {
                         callback: function(value) {
-                            return 'Rp ' + (value / 1000000) + 'jt';
+                            if (value >= 1000000) {
+                                return 'Rp ' + (value / 1000000).toFixed(1) + 'jt';
+                            } else if (value >= 1000) {
+                                return 'Rp ' + (value / 1000).toFixed(0) + 'rb';
+                            } else if (value === 0) {
+                                return 'Rp 0';
+                            } else {
+                                return 'Rp ' + value.toLocaleString('id-ID');
+                            }
                         },
                         font: {
                             size: 11,

@@ -2,70 +2,34 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\Finance\TransactionServiceInterface;
+use App\Models\Category;
+use App\Enums\TransactionType;
 use Illuminate\Http\Request;
 
 class TransactionController extends Controller
 {
+    public function __construct(
+        private TransactionServiceInterface $transactionService
+    ) {}
+
     public function index()
     {
-        // Data dummy transaksi
-        $transactions = [
-            [
-                'id' => 1,
-                'description' => 'Gaji Bulanan',
-                'category' => 'Gaji',
-                'amount' => 10000000,
-                'type' => 'income',
-                'date' => '2024-11-16'
-            ],
-            [
-                'id' => 2,
-                'description' => 'Makan siang tim',
-                'category' => 'Makanan',
-                'amount' => 150000,
-                'type' => 'expense',
-                'date' => '2024-11-17'
-            ],
-            [
-                'id' => 3,
-                'description' => 'Grab ke kantor',
-                'category' => 'Transport',
-                'amount' => 75000,
-                'type' => 'expense',
-                'date' => '2024-11-18'
-            ],
-            [
-                'id' => 4,
-                'description' => 'Freelance Project',
-                'category' => 'Pendapatan Lain',
-                'amount' => 5000000,
-                'type' => 'income',
-                'date' => '2024-11-19'
-            ],
-            [
-                'id' => 5,
-                'description' => 'Belanja groceries',
-                'category' => 'Belanja',
-                'amount' => 500000,
-                'type' => 'expense',
-                'date' => '2024-11-20'
-            ],
-        ];
-
-        $stats = [
-            'totalIncome' => 15000000,
-            'totalExpense' => 725000,
-            'balance' => 14275000,
-        ];
+        $userId = auth()->id();
+        
+        $transactions = $this->transactionService->getAllTransactions($userId);
+        $stats = $this->transactionService->getTransactionStats($userId);
 
         return view('transactions.index', compact('transactions', 'stats'));
     }
 
     public function create()
     {
+        $userId = auth()->id();
+        
         $categories = [
-            'income' => ['Gaji', 'Freelance', 'Investasi', 'Pendapatan Lain'],
-            'expense' => ['Makanan', 'Transport', 'Belanja', 'Tagihan', 'Entertainment', 'Kesehatan']
+            'income' => Category::forUser($userId)->byType(TransactionType::INCOME)->get(),
+            'expense' => Category::forUser($userId)->byType(TransactionType::EXPENSE)->get(),
         ];
 
         return view('transactions.create', compact('categories'));
@@ -73,24 +37,37 @@ class TransactionController extends Controller
 
     public function store(Request $request)
     {
-        // Simulasi store
-        return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil ditambahkan!');
+        $userId = auth()->id();
+        
+        $validated = $request->validate([
+            'type' => 'required|in:income,expense',
+            'amount' => 'required|numeric|min:0',
+            'description' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'transaction_date' => 'required|date',
+        ]);
+
+        try {
+            $this->transactionService->createTransaction($validated, $userId);
+            return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil ditambahkan!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal menambahkan transaksi: ' . $e->getMessage())->withInput();
+        }
     }
 
     public function edit($id)
     {
-        $transaction = [
-            'id' => $id,
-            'description' => 'Gaji Bulanan',
-            'category' => 'Gaji',
-            'amount' => 10000000,
-            'type' => 'income',
-            'date' => '2024-11-16'
-        ];
+        $userId = auth()->id();
+        
+        $transaction = $this->transactionService->getTransactionById($id, $userId);
+        
+        if (!$transaction) {
+            return redirect()->route('transactions.index')->with('error', 'Transaksi tidak ditemukan!');
+        }
 
         $categories = [
-            'income' => ['Gaji', 'Freelance', 'Investasi', 'Pendapatan Lain'],
-            'expense' => ['Makanan', 'Transport', 'Belanja', 'Tagihan', 'Entertainment', 'Kesehatan']
+            'income' => Category::forUser($userId)->byType(TransactionType::INCOME)->get(),
+            'expense' => Category::forUser($userId)->byType(TransactionType::EXPENSE)->get(),
         ];
 
         return view('transactions.edit', compact('transaction', 'categories'));
@@ -98,13 +75,43 @@ class TransactionController extends Controller
 
     public function update(Request $request, $id)
     {
-        // Simulasi update
-        return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil diupdate!');
+        $userId = auth()->id();
+        
+        $validated = $request->validate([
+            'type' => 'required|in:income,expense',
+            'amount' => 'required|numeric|min:0',
+            'description' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'transaction_date' => 'required|date',
+        ]);
+
+        try {
+            $result = $this->transactionService->updateTransaction($id, $validated, $userId);
+            
+            if ($result) {
+                return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil diupdate!');
+            }
+            
+            return back()->with('error', 'Transaksi tidak ditemukan!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal mengupdate transaksi: ' . $e->getMessage())->withInput();
+        }
     }
 
     public function destroy($id)
     {
-        // Simulasi delete
-        return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil dihapus!');
+        $userId = auth()->id();
+        
+        try {
+            $result = $this->transactionService->deleteTransaction($id, $userId);
+            
+            if ($result) {
+                return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil dihapus!');
+            }
+            
+            return back()->with('error', 'Transaksi tidak ditemukan!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal menghapus transaksi: ' . $e->getMessage());
+        }
     }
 }

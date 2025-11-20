@@ -87,18 +87,18 @@
                     @foreach($transactions as $transaction)
                     <tr class="hover:bg-gray-50 transition">
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                            {{ date('d M Y', strtotime($transaction['date'])) }}
+                            {{ $transaction->transaction_date->format('d M Y') }}
                         </td>
                         <td class="px-6 py-4 text-sm">
-                            <p class="font-semibold text-gray-800">{{ $transaction['description'] }}</p>
+                            <p class="font-semibold text-gray-800">{{ $transaction->description }}</p>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
                             <span class="px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
-                                {{ $transaction['category'] }}
+                                {{ $transaction->category->name }}
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            @if($transaction['type'] === 'income')
+                            @if($transaction->type->value === 'income')
                             <span class="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 flex items-center space-x-1 w-fit">
                                 <i class="fas fa-arrow-up"></i>
                                 <span>Pemasukan</span>
@@ -110,15 +110,15 @@
                             </span>
                             @endif
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold {{ $transaction['type'] === 'income' ? 'text-green-600' : 'text-red-600' }}">
-                            {{ $transaction['type'] === 'income' ? '+' : '-' }}Rp {{ number_format($transaction['amount'], 0, ',', '.') }}
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold {{ $transaction->type->value === 'income' ? 'text-green-600' : 'text-red-600' }}">
+                            {{ $transaction->type->value === 'income' ? '+' : '-' }}Rp {{ number_format($transaction->amount, 0, ',', '.') }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center text-sm">
                             <div class="flex items-center justify-center space-x-2">
-                                <a href="{{ route('transactions.edit', $transaction['id']) }}" class="text-blue-600 hover:text-blue-800 transition">
+                                <a href="{{ route('transactions.edit', $transaction->id) }}" class="text-blue-600 hover:text-blue-800 transition">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <form action="{{ route('transactions.destroy', $transaction['id']) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menghapus transaksi ini?')">
+                                <form action="{{ route('transactions.destroy', $transaction->id) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menghapus transaksi ini?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-red-600 hover:text-red-800 transition">

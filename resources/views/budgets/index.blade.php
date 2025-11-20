@@ -48,21 +48,21 @@
 
     <!-- Budget Cards Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-        @foreach($budgets as $budget)
+        @forelse($budgets as $budget)
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition">
             <div class="flex items-start justify-between mb-4">
                 <div class="flex-1">
                     <div class="flex items-center space-x-2 mb-1">
-                        <h4 class="text-lg font-bold text-gray-800">{{ $budget['name'] }}</h4>
-                        <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">{{ $budget['period'] }}</span>
+                        <h4 class="text-lg font-bold text-gray-800">{{ $budget->name }}</h4>
+                        <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">{{ ucfirst($budget->period) }}</span>
                     </div>
-                    <p class="text-sm text-gray-500">{{ $budget['category'] }}</p>
+                    <p class="text-sm text-gray-500">{{ $budget->category->name ?? 'Semua Kategori' }}</p>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <a href="{{ route('budgets.edit', $budget['id']) }}" class="text-blue-600 hover:text-blue-800 transition p-2">
+                    <a href="{{ route('budgets.edit', $budget->id) }}" class="text-blue-600 hover:text-blue-800 transition p-2">
                         <i class="fas fa-edit"></i>
                     </a>
-                    <form action="{{ route('budgets.destroy', $budget['id']) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menghapus anggaran ini?')">
+                    <form action="{{ route('budgets.destroy', $budget->id) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menghapus anggaran ini?')">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="text-red-600 hover:text-red-800 transition p-2">
@@ -75,11 +75,11 @@
             <!-- Progress Bar -->
             <div class="mb-4">
                 <div class="flex items-center justify-between mb-2">
-                    <span class="text-sm font-semibold text-gray-700">Rp {{ number_format($budget['spent'], 0, ',', '.') }}</span>
-                    <span class="text-sm font-semibold text-gray-700">Rp {{ number_format($budget['amount'], 0, ',', '.') }}</span>
+                    <span class="text-sm font-semibold text-gray-700">Rp {{ number_format($budget->spent, 0, ',', '.') }}</span>
+                    <span class="text-sm font-semibold text-gray-700">Rp {{ number_format($budget->amount, 0, ',', '.') }}</span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-3">
-                    <div class="h-3 rounded-full transition-all duration-300 {{ $budget['percentage'] >= 90 ? 'bg-red-500' : ($budget['percentage'] >= 70 ? 'bg-yellow-500' : 'bg-green-500') }}" style="width: {{ min($budget['percentage'], 100) }}%"></div>
+                    <div class="h-3 rounded-full transition-all duration-300 {{ $budget->percentage >= 90 ? 'bg-red-500' : ($budget->percentage >= 70 ? 'bg-yellow-500' : 'bg-green-500') }}" style="width: {{ min($budget->percentage, 100) }}%"></div>
                 </div>
             </div>
 
@@ -87,19 +87,19 @@
             <div class="grid grid-cols-3 gap-4 pt-4 border-t border-gray-100">
                 <div>
                     <p class="text-xs text-gray-500 mb-1">Terpakai</p>
-                    <p class="text-sm font-bold {{ $budget['percentage'] >= 90 ? 'text-red-600' : 'text-gray-800' }}">{{ $budget['percentage'] }}%</p>
+                    <p class="text-sm font-bold {{ $budget->percentage >= 90 ? 'text-red-600' : 'text-gray-800' }}">{{ $budget->percentage }}%</p>
                 </div>
                 <div>
                     <p class="text-xs text-gray-500 mb-1">Sisa</p>
-                    <p class="text-sm font-bold text-gray-800">Rp {{ number_format($budget['amount'] - $budget['spent'], 0, ',', '.') }}</p>
+                    <p class="text-sm font-bold text-gray-800">Rp {{ number_format($budget->remaining, 0, ',', '.') }}</p>
                 </div>
                 <div>
                     <p class="text-xs text-gray-500 mb-1">Status</p>
-                    @if($budget['percentage'] >= 90)
+                    @if($budget->percentage >= 90)
                     <span class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full font-medium">
                         <i class="fas fa-exclamation-circle"></i> Kritis
                     </span>
-                    @elseif($budget['percentage'] >= 70)
+                    @elseif($budget->percentage >= 70)
                     <span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full font-medium">
                         <i class="fas fa-exclamation-triangle"></i> Peringatan
                     </span>
@@ -115,11 +115,21 @@
             <div class="mt-4 pt-4 border-t border-gray-100">
                 <p class="text-xs text-gray-500">
                     <i class="fas fa-calendar mr-1"></i>
-                    {{ date('d M Y', strtotime($budget['start_date'])) }} - {{ date('d M Y', strtotime($budget['end_date'])) }}
+                    {{ $budget->start_date->format('d M Y') }} - {{ $budget->end_date->format('d M Y') }}
                 </p>
             </div>
         </div>
-        @endforeach
+        @empty
+        <div class="col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
+            <i class="fas fa-wallet text-6xl text-gray-300 mb-4"></i>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">Belum Ada Anggaran</h3>
+            <p class="text-gray-600 mb-6">Mulai kelola keuangan Anda dengan membuat anggaran pertama</p>
+            <a href="{{ route('budgets.create') }}" class="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold">
+                <i class="fas fa-plus mr-2"></i>
+                Buat Anggaran Baru
+            </a>
+        </div>
+        @endforelse
     </div>
 
     @if(count($budgets) === 0)

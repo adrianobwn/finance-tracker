@@ -29,12 +29,13 @@
                 <!-- Category -->
                 <div class="mb-6">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Kategori</label>
-                    <select name="category" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
-                        <option value="">Pilih Kategori</option>
+                    <select name="category_id" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">Semua Kategori</option>
                         @foreach($categories as $cat)
-                        <option value="{{ $cat }}">{{ $cat }}</option>
+                        <option value="{{ $cat->id }}">{{ $cat->icon }} {{ $cat->name }}</option>
                         @endforeach
                     </select>
+                    <p class="text-xs text-gray-500 mt-1">Kosongkan untuk anggaran semua kategori</p>
                 </div>
 
                 <!-- Period -->
