@@ -23,11 +23,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
     
     // Dashboard - Redirect admin to admin dashboard
-    Route::get('/', function() {
+    Route::get('/', function(\Illuminate\Http\Request $request) {
         if (auth()->user()->role->value === 'admin') {
             return redirect()->route('admin.dashboard');
         }
-        return app(DashboardController::class)->index();
+        return app(DashboardController::class)->index($request);
     })->name('dashboard');
 
     // Transactions
