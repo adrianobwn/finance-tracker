@@ -101,12 +101,12 @@
                             @if($transaction->type->value === 'income')
                             <span class="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 flex items-center space-x-1 w-fit">
                                 <i class="fas fa-arrow-up"></i>
-                                <span>Pemasukan</span>
+                                
                             </span>
                             @else
                             <span class="px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700 flex items-center space-x-1 w-fit">
                                 <i class="fas fa-arrow-down"></i>
-                                <span>Pengeluaran</span>
+                                
                             </span>
                             @endif
                         </td>
