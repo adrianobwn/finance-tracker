@@ -13,7 +13,7 @@
             <div class="flex items-center justify-between mb-4">
                 <div>
                     <p class="text-sm text-gray-500 mb-1">Total Saldo</p>
-                    <h3 class="text-2xl font-bold text-gray-800">Rp {{ number_format($totalSales, 0, ',', '.') }}</h3>
+                    <h3 class="text-2xl font-bold text-gray-800">{{ format_currency($totalSales, auth()->user()->currency) }}</h3>
                     <p class="text-xs text-gray-400 mt-1">Saldo saat ini</p>
                 </div>
                 <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
@@ -27,7 +27,7 @@
             <div class="flex items-center justify-between mb-4">
                 <div>
                     <p class="text-sm text-gray-500 mb-1">Total Pemasukan</p>
-                    <h3 class="text-2xl font-bold text-green-600">Rp {{ number_format($totalIncome, 0, ',', '.') }}</h3>
+                    <h3 class="text-2xl font-bold text-green-600">{{ format_currency($totalIncome, auth()->user()->currency) }}</h3>
                     <p class="text-xs text-gray-400 mt-1">Bulan ini</p>
                 </div>
                 <div class="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
@@ -41,7 +41,7 @@
             <div class="flex items-center justify-between mb-4">
                 <div>
                     <p class="text-sm text-gray-500 mb-1">Total Pengeluaran</p>
-                    <h3 class="text-2xl font-bold text-red-600">Rp {{ number_format($totalExpense, 0, ',', '.') }}</h3>
+                    <h3 class="text-2xl font-bold text-red-600">{{ format_currency($totalExpense, auth()->user()->currency) }}</h3>
                     <p class="text-xs text-gray-400 mt-1">Bulan ini</p>
                 </div>
                 <div class="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center">
@@ -110,9 +110,9 @@
                         </div>
                     </div>
                     <div class="text-right">
-                        <p class="text-sm font-bold {{ $transaction->type->value === 'income' ? 'text-green-600' : 'text-red-600' }}">
-                            {{ $transaction->type->value === 'income' ? '+' : '-'}}Rp {{ number_format($transaction->amount, 0, ',', '.') }}
-                        </p>
+                        <span class="text-sm font-semibold {{ $transaction->type->value === 'income' ? 'text-green-600' : 'text-red-600' }}">
+                            {{ $transaction->type->value === 'income' ? '+' : '-'}}{{ format_currency($transaction->amount, auth()->user()->currency) }}
+                        </span>
                     </div>
                 </div>
                 @empty
@@ -130,6 +130,7 @@
 </div>
 
 <script>
+    const currencySymbol = '{{ currency_symbol(auth()->user()->currency) }}';
     // Chart.js Configuration
     const ctx = document.getElementById('financeChart').getContext('2d');
     
@@ -201,11 +202,11 @@
                                 label += ': ';
                             }
                             if (context.parsed.y >= 1000000) {
-                                label += 'Rp ' + (context.parsed.y / 1000000).toFixed(1) + ' jt';
+                                label += currencySymbol + ' ' + (context.parsed.y / 1000000).toFixed(1) + ' jt';
                             } else if (context.parsed.y >= 1000) {
-                                label += 'Rp ' + (context.parsed.y / 1000).toFixed(0) + ' rb';
+                                label += currencySymbol + ' ' + (context.parsed.y / 1000).toFixed(0) + ' rb';
                             } else {
-                                label += 'Rp ' + context.parsed.y.toLocaleString('id-ID');
+                                label += currencySymbol + ' ' + context.parsed.y.toLocaleString('id-ID');
                             }
                             return label;
                         }
@@ -218,13 +219,13 @@
                     ticks: {
                         callback: function(value) {
                             if (value >= 1000000) {
-                                return 'Rp ' + (value / 1000000).toFixed(1) + 'jt';
+                                return currencySymbol + ' ' + (value / 1000000).toFixed(1) + 'jt';
                             } else if (value >= 1000) {
-                                return 'Rp ' + (value / 1000).toFixed(0) + 'rb';
+                                return currencySymbol + ' ' + (value / 1000).toFixed(0) + 'rb';
                             } else if (value === 0) {
-                                return 'Rp 0';
+                                return currencySymbol + ' 0';
                             } else {
-                                return 'Rp ' + value.toLocaleString('id-ID');
+                                return currencySymbol + ' ' + value.toLocaleString('id-ID');
                             }
                         },
                         font: {

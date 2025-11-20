@@ -19,7 +19,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-green-100 text-sm mb-1">Total Pemasukan</p>
-                    <h3 class="text-3xl font-bold">Rp {{ number_format($stats['totalIncome'], 0, ',', '.') }}</h3>
+                    <h3 class="text-3xl font-bold">{{ format_currency($stats['totalIncome'], auth()->user()->currency) }}</h3>
                 </div>
                 <div class="w-14 h-14 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
                     <i class="fas fa-arrow-up text-2xl"></i>
@@ -31,7 +31,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-red-100 text-sm mb-1">Total Pengeluaran</p>
-                    <h3 class="text-3xl font-bold">Rp {{ number_format($stats['totalExpense'], 0, ',', '.') }}</h3>
+                    <h3 class="text-3xl font-bold">{{ format_currency($stats['totalExpense'], auth()->user()->currency) }}</h3>
                 </div>
                 <div class="w-14 h-14 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
                     <i class="fas fa-arrow-down text-2xl"></i>
@@ -43,7 +43,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-blue-100 text-sm mb-1">Saldo</p>
-                    <h3 class="text-3xl font-bold">Rp {{ number_format($stats['balance'], 0, ',', '.') }}</h3>
+                    <h3 class="text-3xl font-bold">{{ format_currency($stats['balance'], auth()->user()->currency) }}</h3>
                 </div>
                 <div class="w-14 h-14 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
                     <i class="fas fa-wallet text-2xl"></i>
@@ -111,7 +111,7 @@
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-bold {{ $transaction->type->value === 'income' ? 'text-green-600' : 'text-red-600' }}">
-                            {{ $transaction->type->value === 'income' ? '+' : '-' }}Rp {{ number_format($transaction->amount, 0, ',', '.') }}
+                            {{ $transaction->type->value === 'income' ? '+' : '-' }}{{ format_currency($transaction->amount, auth()->user()->currency) }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center text-sm">
                             <div class="flex items-center justify-center space-x-2">

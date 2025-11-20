@@ -15,7 +15,7 @@
                     <i class="fas fa-arrow-up text-green-600"></i>
                 </div>
             </div>
-            <h3 class="text-2xl font-bold text-gray-800">Rp {{ number_format($summary['totalIncome'], 0, ',', '.') }}</h3>
+            <h3 class="text-2xl font-bold text-gray-800">{{ format_currency($summary['totalIncome'], auth()->user()->currency) }}</h3>
             <p class="text-xs text-gray-400 mt-1">Total tahun ini</p>
         </div>
 
@@ -26,7 +26,7 @@
                     <i class="fas fa-arrow-down text-red-600"></i>
                 </div>
             </div>
-            <h3 class="text-2xl font-bold text-gray-800">Rp {{ number_format($summary['totalExpense'], 0, ',', '.') }}</h3>
+            <h3 class="text-2xl font-bold text-gray-800">{{ format_currency($summary['totalExpense'], auth()->user()->currency) }}</h3>
             <p class="text-xs text-gray-400 mt-1">Total tahun ini</p>
         </div>
 
@@ -37,7 +37,7 @@
                     <i class="fas fa-piggy-bank text-blue-600"></i>
                 </div>
             </div>
-            <h3 class="text-2xl font-bold text-gray-800">Rp {{ number_format($summary['netSavings'], 0, ',', '.') }}</h3>
+            <h3 class="text-2xl font-bold text-gray-800">{{ format_currency($summary['netSavings'], auth()->user()->currency) }}</h3>
             <p class="text-xs text-gray-400 mt-1">Total tahun ini</p>
         </div>
 
@@ -121,7 +121,7 @@
                         <div class="flex-1 bg-gray-200 rounded-full h-2">
                             <div class="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-300" style="width: {{ $cat['percentage'] }}%"></div>
                         </div>
-                        <span class="text-sm text-gray-600 whitespace-nowrap">Rp {{ number_format($cat['amount'], 0, ',', '.') }}</span>
+                        <span class="text-sm text-gray-600 whitespace-nowrap">{{ format_currency($cat['amount'], auth()->user()->currency) }}</span>
                     </div>
                 </div>
                 @endforeach
@@ -163,13 +163,13 @@
                     <tr class="hover:bg-gray-50 transition">
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-800">{{ $month }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-green-600 font-semibold">
-                            +Rp {{ number_format($income, 0, ',', '.') }}
+                            +{{ format_currency($income, auth()->user()->currency) }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-red-600 font-semibold">
-                            -Rp {{ number_format($expense, 0, ',', '.') }}
+                            -{{ format_currency($expense, auth()->user()->currency) }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-bold text-gray-800">
-                            Rp {{ number_format($savings, 0, ',', '.') }}
+                            {{ format_currency($savings, auth()->user()->currency) }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-right">
                             <span class="px-3 py-1 rounded-full text-xs font-medium {{ $rate >= 50 ? 'bg-green-100 text-green-700' : ($rate >= 30 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700') }}">
@@ -186,6 +186,7 @@
 </div>
 
 <script>
+    const currencySymbol = '{{ currency_symbol(auth()->user()->currency) }}';
     // Monthly Trend Chart
     const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
     new Chart(monthlyCtx, {
@@ -224,7 +225,7 @@
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            return context.dataset.label + ': Rp ' + context.parsed.y.toLocaleString('id-ID');
+                            return context.dataset.label + ': ' + currencySymbol + ' ' + context.parsed.y.toLocaleString('id-ID');
                         }
                     }
                 }
@@ -234,7 +235,7 @@
                     beginAtZero: true,
                     ticks: {
                         callback: function(value) {
-                            return 'Rp ' + (value / 1000000) + 'jt';
+                            return currencySymbol + ' ' + (value / 1000000) + 'jt';
                         }
                     }
                 }
@@ -290,7 +291,7 @@
                     callbacks: {
                         label: function(context) {
                             const percentage = @json(array_column($categoryExpenses, 'percentage'))[context.dataIndex];
-                            return context.label + ': Rp ' + context.parsed.toLocaleString('id-ID') + ' (' + percentage + '%)';
+                            return context.label + ': ' + currencySymbol + ' ' + context.parsed.toLocaleString('id-ID') + ' (' + percentage + '%)';
                         }
                     }
                 }

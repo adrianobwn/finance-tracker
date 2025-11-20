@@ -18,15 +18,15 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div>
                 <p class="text-indigo-100 text-sm mb-1">Total Anggaran</p>
-                <h3 class="text-3xl font-bold">Rp {{ number_format($summary['totalBudget'], 0, ',', '.') }}</h3>
+                <h3 class="text-3xl font-bold">{{ format_currency($summary['totalBudget'], auth()->user()->currency) }}</h3>
             </div>
             <div>
                 <p class="text-indigo-100 text-sm mb-1">Total Terpakai</p>
-                <h3 class="text-3xl font-bold">Rp {{ number_format($summary['totalSpent'], 0, ',', '.') }}</h3>
+                <h3 class="text-3xl font-bold">{{ format_currency($summary['totalSpent'], auth()->user()->currency) }}</h3>
             </div>
             <div>
                 <p class="text-indigo-100 text-sm mb-1">Sisa Anggaran</p>
-                <h3 class="text-3xl font-bold">Rp {{ number_format($summary['remaining'], 0, ',', '.') }}</h3>
+                <h3 class="text-3xl font-bold">{{ format_currency($summary['remaining'], auth()->user()->currency) }}</h3>
             </div>
             <div>
                 <p class="text-indigo-100 text-sm mb-1">Persentase</p>
@@ -77,11 +77,11 @@
                 <div class="flex items-center justify-between mb-2">
                     <div>
                         <span class="text-xs text-gray-500">Terpakai</span>
-                        <p class="text-sm font-bold text-gray-800">Rp {{ number_format($budget->spent, 0, ',', '.') }}</p>
+                        <p class="text-sm font-bold text-gray-800">{{ format_currency($budget->spent, auth()->user()->currency) }}</p>
                     </div>
                     <div class="text-right">
                         <span class="text-xs text-gray-500">Target</span>
-                        <p class="text-sm font-bold text-gray-800">Rp {{ number_format($budget->amount, 0, ',', '.') }}</p>
+                        <p class="text-sm font-bold text-gray-800">{{ format_currency($budget->amount, auth()->user()->currency) }}</p>
                     </div>
                 </div>
                 <div class="relative w-full bg-gray-200 rounded-full h-4 overflow-hidden">
@@ -105,7 +105,7 @@
                 <div>
                     <p class="text-xs text-gray-500 mb-1">Sisa Budget</p>
                     <p class="text-sm font-bold {{ $budget->remaining < 0 ? 'text-red-600' : 'text-green-600' }}">
-                        Rp {{ number_format(abs($budget->remaining), 0, ',', '.') }}
+                        {{ format_currency(abs($budget->remaining), auth()->user()->currency) }}
                         @if($budget->remaining < 0)
                         <span class="text-xs">(Lebih)</span>
                         @endif
