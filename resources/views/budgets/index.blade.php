@@ -142,15 +142,6 @@
             </div>
         </div>
         @empty
-        <div class="col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
-            <i class="fas fa-wallet text-6xl text-gray-300 mb-4"></i>
-            <h3 class="text-xl font-bold text-gray-800 mb-2">Belum Ada Anggaran</h3>
-            <p class="text-gray-600 mb-6">Mulai kelola keuangan Anda dengan membuat anggaran pertama</p>
-            <a href="{{ route('budgets.create') }}" class="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold">
-                <i class="fas fa-plus mr-2"></i>
-                Buat Anggaran Baru
-            </a>
-        </div>
         @endforelse
     </div>
 

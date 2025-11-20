@@ -15,8 +15,22 @@ class SettingsController extends Controller
         }
         
         $categories = Category::forUser(auth()->id())->get();
+        $user = auth()->user();
         
-        return view('settings.index', compact('categories'));
+        return view('settings.index', compact('categories', 'user'));
+    }
+
+    public function updateCurrency(Request $request)
+    {
+        $request->validate([
+            'currency' => ['required', 'string', 'in:IDR,USD,EUR,GBP,JPY,SGD,MYR'],
+        ]);
+
+        auth()->user()->update([
+            'currency' => $request->currency,
+        ]);
+
+        return back()->with('success', 'Mata uang berhasil diperbarui!');
     }
 
     public function storeCategory(Request $request)

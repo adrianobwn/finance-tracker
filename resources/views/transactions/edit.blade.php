@@ -38,8 +38,10 @@
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Jumlah</label>
                     <div class="relative">
                         <span class="absolute left-4 top-3 text-gray-500 font-medium">Rp</span>
-                        <input type="number" name="amount" value="{{ $transaction['amount'] }}" min="0" step="0.01" class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="0" required>
+                        <input type="text" id="amountDisplay" class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="0" value="{{ number_format($transaction['amount'], 0, ',', '.') }}" oninput="formatAmount(this)" required>
+                        <input type="hidden" name="amount" id="amountValue" value="{{ $transaction['amount'] }}" required>
                     </div>
+                    <p class="text-xs text-gray-500 mt-1">Contoh: 1.000.000 untuk satu juta</p>
                 </div>
 
                 <!-- Description -->
@@ -111,6 +113,24 @@ function filterCategories() {
 document.addEventListener('DOMContentLoaded', function() {
     filterCategories();
 });
+
+// Format amount with thousand separators
+function formatAmount(input) {
+    let value = input.value.replace(/\D/g, ''); // Remove non-digits
+    
+    if (value === '') {
+        document.getElementById('amountValue').value = '';
+        input.value = '';
+        return;
+    }
+    
+    // Format with thousand separator
+    let formatted = new Intl.NumberFormat('id-ID').format(value);
+    input.value = formatted;
+    
+    // Store raw value in hidden input
+    document.getElementById('amountValue').value = value;
+}
 </script>
 
 @endsection

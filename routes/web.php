@@ -57,6 +57,7 @@ Route::middleware('auth')->group(function () {
 
     // Settings
     Route::get('/settings', [\App\Http\Controllers\SettingsController::class, 'index'])->name('settings.index');
+    Route::post('/settings/currency', [\App\Http\Controllers\SettingsController::class, 'updateCurrency'])->name('settings.currency.update');
     Route::post('/settings/category', [\App\Http\Controllers\SettingsController::class, 'storeCategory'])->name('settings.category.store');
     Route::put('/settings/category/{id}', [\App\Http\Controllers\SettingsController::class, 'updateCategory'])->name('settings.category.update');
     Route::delete('/settings/category/{id}', [\App\Http\Controllers\SettingsController::class, 'destroyCategory'])->name('settings.category.destroy');

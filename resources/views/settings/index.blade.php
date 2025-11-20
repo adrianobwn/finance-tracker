@@ -72,7 +72,9 @@
                         @foreach($incomeCategories as $category)
                         <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:border-green-300 transition">
                             <div class="flex items-center space-x-3">
-                                <span class="text-2xl">{{ $category->icon }}</span>
+                                <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background-color: {{ $category->color }}20;">
+                                    <i class="fas {{ $category->icon }}" style="color: {{ $category->color }};"></i>
+                                </div>
                                 <div>
                                     <p class="text-sm font-semibold text-gray-800">{{ $category->name }}</p>
                                     @if($category->is_default)
@@ -113,7 +115,9 @@
                         @foreach($expenseCategories as $category)
                         <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:border-red-300 transition">
                             <div class="flex items-center space-x-3">
-                                <span class="text-2xl">{{ $category->icon }}</span>
+                                <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background-color: {{ $category->color }}20;">
+                                    <i class="fas {{ $category->icon }}" style="color: {{ $category->color }};"></i>
+                                </div>
                                 <div>
                                     <p class="text-sm font-semibold text-gray-800">{{ $category->name }}</p>
                                     @if($category->is_default)
@@ -155,17 +159,26 @@
 
             <div class="space-y-6">
                 <!-- Currency -->
-                <div class="flex items-center justify-between pb-6 border-b border-gray-200">
-                    <div>
-                        <p class="font-semibold text-gray-800">Mata Uang</p>
-                        <p class="text-sm text-gray-600">Mata uang yang digunakan untuk transaksi</p>
+                <form action="{{ route('settings.currency.update') }}" method="POST">
+                    @csrf
+                    <div class="flex items-center justify-between pb-6 border-b border-gray-200">
+                        <div>
+                            <p class="font-semibold text-gray-800">Mata Uang</p>
+                            <p class="text-sm text-gray-600">Mata uang yang digunakan untuk transaksi</p>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <select name="currency" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" onchange="this.form.submit()">
+                                <option value="IDR" {{ $user->currency === 'IDR' ? 'selected' : '' }}>IDR - Rupiah Indonesia</option>
+                                <option value="USD" {{ $user->currency === 'USD' ? 'selected' : '' }}>USD - US Dollar</option>
+                                <option value="EUR" {{ $user->currency === 'EUR' ? 'selected' : '' }}>EUR - Euro</option>
+                                <option value="GBP" {{ $user->currency === 'GBP' ? 'selected' : '' }}>GBP - British Pound</option>
+                                <option value="JPY" {{ $user->currency === 'JPY' ? 'selected' : '' }}>JPY - Japanese Yen</option>
+                                <option value="SGD" {{ $user->currency === 'SGD' ? 'selected' : '' }}>SGD - Singapore Dollar</option>
+                                <option value="MYR" {{ $user->currency === 'MYR' ? 'selected' : '' }}>MYR - Malaysian Ringgit</option>
+                            </select>
+                        </div>
                     </div>
-                    <select class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                        <option>IDR - Rupiah Indonesia</option>
-                        <option>USD - US Dollar</option>
-                        <option>EUR - Euro</option>
-                    </select>
-                </div>
+                </form>
 
                 <!-- Notifications -->
                 <div class="flex items-center justify-between pb-6 border-b border-gray-200">
@@ -224,15 +237,27 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Icon (Emoji)</label>
-                    <input 
-                        type="text" 
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Icon (Font Awesome)</label>
+                    <select 
                         name="icon"
                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        placeholder="📊"
-                        maxlength="2"
                         required
                     >
+                        <option value="fa-wallet">💰 Wallet</option>
+                        <option value="fa-money-bill">💵 Money</option>
+                        <option value="fa-credit-card">💳 Credit Card</option>
+                        <option value="fa-shopping-bag">🛍️ Shopping</option>
+                        <option value="fa-utensils">🍴 Food</option>
+                        <option value="fa-car">🚗 Car</option>
+                        <option value="fa-home">🏠 Home</option>
+                        <option value="fa-plane">✈️ Travel</option>
+                        <option value="fa-heart">❤️ Health</option>
+                        <option value="fa-gamepad">🎮 Entertainment</option>
+                        <option value="fa-book">📚 Education</option>
+                        <option value="fa-gift">🎁 Gift</option>
+                        <option value="fa-chart-line">📈 Investment</option>
+                        <option value="fa-briefcase">💼 Work</option>
+                    </select>
                 </div>
 
                 <div>
@@ -288,15 +313,28 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Icon (Emoji)</label>
-                    <input 
-                        type="text" 
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Icon (Font Awesome)</label>
+                    <select 
                         id="edit_icon"
                         name="icon"
                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        maxlength="2"
                         required
                     >
+                        <option value="fa-wallet">💰 Wallet</option>
+                        <option value="fa-money-bill">💵 Money</option>
+                        <option value="fa-credit-card">💳 Credit Card</option>
+                        <option value="fa-shopping-bag">🛍️ Shopping</option>
+                        <option value="fa-utensils">🍴 Food</option>
+                        <option value="fa-car">🚗 Car</option>
+                        <option value="fa-home">🏠 Home</option>
+                        <option value="fa-plane">✈️ Travel</option>
+                        <option value="fa-heart">❤️ Health</option>
+                        <option value="fa-gamepad">🎮 Entertainment</option>
+                        <option value="fa-book">📚 Education</option>
+                        <option value="fa-gift">🎁 Gift</option>
+                        <option value="fa-chart-line">📈 Investment</option>
+                        <option value="fa-briefcase">💼 Work</option>
+                    </select>
                 </div>
 
                 <div>
