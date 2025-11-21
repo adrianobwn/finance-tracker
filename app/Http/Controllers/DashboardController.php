@@ -67,8 +67,12 @@ class DashboardController extends Controller
         // Get recent transactions
         $recentTransactions = $this->transactionService->getRecentTransactions($userId, 3);
         
-        // Get chart data (6 months trend)
-        $chartData = $this->reportService->getTrendData($userId, 6);
+        // Get chart data - use filtered date range if available, otherwise 6 months trend
+        if ($startDate && $endDate) {
+            $chartData = $this->reportService->getTrendDataByDateRange($userId, $startDate, $endDate);
+        } else {
+            $chartData = $this->reportService->getTrendData($userId, 6);
+        }
         
         return view('dashboard', [
             'totalSales' => $stats['balance'],

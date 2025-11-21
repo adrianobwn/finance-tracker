@@ -11,4 +11,6 @@ interface ReportServiceInterface
     public function getFinancialSummary(?int $userId, string $startDate, string $endDate): array;
     
     public function getTrendData(?int $userId, int $months = 6): array;
+    
+    public function getTrendDataByDateRange(?int $userId, string $startDate, string $endDate): array;
 }

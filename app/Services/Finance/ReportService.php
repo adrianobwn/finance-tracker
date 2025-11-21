@@ -132,4 +132,77 @@ class ReportService implements ReportServiceInterface
             'expense' => $expense,
         ];
     }
+    
+    public function getTrendDataByDateRange(?int $userId, string $startDate, string $endDate): array
+    {
+        $labels = [];
+        $income = [];
+        $expense = [];
+        
+        $start = \Carbon\Carbon::parse($startDate);
+        $end = \Carbon\Carbon::parse($endDate);
+        
+        // Calculate difference in days
+        $diffInDays = $start->diffInDays($end);
+        
+        // If range is more than 60 days, group by month, otherwise by day
+        if ($diffInDays > 60) {
+            // Group by month
+            $currentDate = $start->copy()->startOfMonth();
+            $endMonth = $end->copy()->endOfMonth();
+            
+            while ($currentDate <= $endMonth) {
+                $monthStart = $currentDate->format('Y-m-d');
+                $monthEnd = $currentDate->copy()->endOfMonth()->format('Y-m-d');
+                
+                // Don't go beyond the end date
+                if ($currentDate->copy()->endOfMonth() > $end) {
+                    $monthEnd = $end->format('Y-m-d');
+                }
+                
+                $labels[] = $currentDate->format('M Y');
+                
+                $incomeQuery = Transaction::query()->byType(TransactionType::INCOME)->inDateRange($monthStart, $monthEnd);
+                $expenseQuery = Transaction::query()->byType(TransactionType::EXPENSE)->inDateRange($monthStart, $monthEnd);
+                
+                if ($userId !== null) {
+                    $incomeQuery->forUser($userId);
+                    $expenseQuery->forUser($userId);
+                }
+                
+                $income[] = (float) $incomeQuery->sum('amount');
+                $expense[] = (float) $expenseQuery->sum('amount');
+                
+                $currentDate->addMonth();
+            }
+        } else {
+            // Group by day
+            $currentDate = $start->copy();
+            
+            while ($currentDate <= $end) {
+                $dayDate = $currentDate->format('Y-m-d');
+                
+                $labels[] = $currentDate->format('d M');
+                
+                $incomeQuery = Transaction::query()->byType(TransactionType::INCOME)->whereDate('transaction_date', $dayDate);
+                $expenseQuery = Transaction::query()->byType(TransactionType::EXPENSE)->whereDate('transaction_date', $dayDate);
+                
+                if ($userId !== null) {
+                    $incomeQuery->forUser($userId);
+                    $expenseQuery->forUser($userId);
+                }
+                
+                $income[] = (float) $incomeQuery->sum('amount');
+                $expense[] = (float) $expenseQuery->sum('amount');
+                
+                $currentDate->addDay();
+            }
+        }
+        
+        return [
+            'labels' => $labels,
+            'income' => $income,
+            'expense' => $expense,
+        ];
+    }
 }
